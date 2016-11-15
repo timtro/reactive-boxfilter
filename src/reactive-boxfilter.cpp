@@ -4,6 +4,8 @@
 #include "convolution-filters.hpp"
 #include <thread>
 
+#include <cstdio>
+
 using namespace std::chrono_literals;
 
 struct FilePrinter : public Observer {
@@ -21,18 +23,20 @@ struct FilePrinter : public Observer {
 int main() {
   FilePrinter unfilteredPrinter(CFile{"unfiltered.out", "w"});
   FilePrinter filteredPrinter(CFile{"filtered.out", "w"});
+  FilePrinter origPrinter(CFile{"orig.out", "w"});
 
   auto proxHeart = std::make_shared<signal::HeartBeatProxy>();
   signal::HeartBeat heart;
-  signal::SineWave sinesource;
+  signal::SineWave sineSource;
   signal::Noisifier noiseSource;
-  filter::SlidingAverage box{5};
+  filter::SlidingAverage<7> box;
 
   heart.attach_observer(proxHeart.get());
-  heart.attach_observer(&sinesource);
-  sinesource.attach_observer(&noiseSource);
+  heart.attach_observer(&sineSource);
+  sineSource.attach_observer(&noiseSource);
   noiseSource.attach_observer(&box);
 
+  sineSource.attach_observer(&origPrinter);
   noiseSource.attach_observer(&unfilteredPrinter);
   box.attach_observer(&filteredPrinter);
 

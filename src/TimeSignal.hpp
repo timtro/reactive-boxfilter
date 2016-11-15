@@ -13,6 +13,7 @@ using clock_point = std::chrono::time_point<std::chrono::steady_clock>;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::duration;
+
 using signal_value = std::pair<clock_point, double>;
 
 struct TimeSignal : public Subject {
